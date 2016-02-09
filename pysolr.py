@@ -200,7 +200,7 @@ def is_valid_xml_char_ordinal(i):
         or i in (0x9, 0xA, 0xD)
         or 0xE000 <= i <= 0xFFFD
         or 0x10000 <= i <= 0x10FFFF
-        )
+    )
 
 
 def clean_xml_string(s):
@@ -316,7 +316,7 @@ class Solr(object):
         solr = pysolr.Solr('http://localhost:8983/solr', results_cls=dict)
 
     """
-    def __init__(self, url, decoder=None, timeout=60, results_cls=Results):
+    def __init__(self, url, decoder=None, timeout=60, results_cls=Results, auth=None):
         self.decoder = decoder or json.JSONDecoder()
         self.url = url
         self.timeout = timeout
@@ -324,6 +324,7 @@ class Solr(object):
         self.session = requests.Session()
         self.session.stream = False
         self.results_cls = results_cls
+        self.auth = auth
 
     def _get_log(self):
         return LOG
@@ -366,7 +367,7 @@ class Solr(object):
 
         try:
             resp = requests_method(url, data=bytes_body, headers=headers, files=files,
-                                   timeout=self.timeout)
+                                   timeout=self.timeout, auth=self.auth)
         except requests.exceptions.Timeout as err:
             error_message = "Connection to server '%s' timed out: %s"
             self.log.error(error_message, url, err, exc_info=True)
